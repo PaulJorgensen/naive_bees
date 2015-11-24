@@ -13,6 +13,7 @@ from sklearn.preprocessing import OneHotEncoder
 out = "/home/ubuntu/CNN_tensor_flow_output.txt"
 home_dir = "/home/ubuntu/bee_images/train"
 labels = "/home/ubuntu/bee_images"
+test_dir = "/home/ubuntu/bee_images/test"
 # directory of current file
 fp = os.path.dirname(os.path.realpath(__file__))
 
@@ -63,10 +64,10 @@ def max_pool_2x2(x):
 W_conv1 = weight_variable([8, 8, 3, 32])
 b_conv1 = bias_variable([32])
 
-x = tf.placeholder("float", shape=[None,200,200,3])
+x = tf.placeholder("float", shape=[None, 200, 200, 3])
 y_ = tf.placeholder("float", shape=[None, 2])
 
-x_image = tf.reshape(x, [-1,200,200,3])
+x_image = tf.reshape(x, [-1, 200, 200, 3])
 
 h_conv1 = tf.clip_by_norm(tf.nn.relu(conv2d(x_image, W_conv1) + b_conv1), 10)
 h_pool1 = max_pool_2x2(h_conv1)
@@ -80,7 +81,7 @@ h_pool2 = max_pool_2x2(h_conv2)
 W_fc1 = weight_variable([50 * 50 * 64, 1024])
 b_fc1 = bias_variable([1024])
 
-h_pool2_flat = tf.reshape(h_pool2, [-1, 50*50*64])
+h_pool2_flat = tf.reshape(h_pool2, [-1, 50 * 50 * 64])
 h_fc1 = tf.nn.relu(tf.matmul(h_pool2_flat, W_fc1) + b_fc1)
 
 keep_prob = tf.placeholder("float")
@@ -125,12 +126,20 @@ for i in range(0,len(train_y),10):
         print "step %d, training accuracy %s"%(i, str(round(train_accuracy,3)))
     train_step.run(feed_dict={x: batch_xs, y_: batch_ys, keep_prob: 0.5})
 
+### When we want to use the test images:
+# test_images = os.listdir(test_dir)
+# test_images = filter(lambda f: f[-3:] == 'jpg', test_images)
+# test_bees = []
+# for i in test_images:
+#    test_bees.append(imread(test_dir + "/" + i, as_grey = False))
+# test_bees = np.array(test_bees)/255.0
+# feed_dict_test = {x: test_bees, keep_prob: 1.0}
+# classification = sess.run(y_conv, feed_dict_test)
+
 feed_dict_3 = {x: test_x[:10], keep_prob: 1.0}
 classification = sess.run(y_conv, feed_dict_3)
 
 print classification
-
-
 
 sys.stdout = orig_stdout
 f.close()
